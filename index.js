@@ -1,13 +1,11 @@
 // DOM elements and variables
-const section2 = document.getElementById("settings-2"),
-section3a = document.getElementById("dl-category-select-3a"),
+const section3a = document.getElementById("dl-category-select-3a"),
 section3b = document.getElementById("raw-search-3b");
 
 const useTemplateBtn = document.querySelector(".use-template"),
 noTemplateBtn = document.querySelector(".no-template");
 
-const fileUpload = document.querySelector("#file-upload"),
-fileNameDisplay = document.querySelectorAll(".file-name");
+const fileUpload = document.querySelector("#file-upload");
 
 const initialSearchBtn = document.getElementById("initial-search-button"),
 caseSensitivity = document.getElementById('case-sensitive');
@@ -51,11 +49,6 @@ docsLink.addEventListener('click', () => dlDocs.style.display = 'block');
 
 fileUpload.addEventListener("change", (e) => {
     document.getElementById('file-select-form').submit();
-    // section2.classList.add("show");
-
-    fileNameDisplay.forEach((section) => {
-        section.textContent = `${fileUpload.files[0].name}`;
-    });
 });
 
 // Use template
@@ -118,13 +111,13 @@ nextBtn.addEventListener("click", () => {
 }) 
 
 saveAsNewDocxFileBtn.addEventListener("click", () => {
-    if (!newFileName.value) {
-        window.alert('please enter filename')
-    } else {
-        saveAsDocxFile(collectedEntriesContainer, seperatedSelectedCategories);
-    }
-
-
+    let sectionsArray = [];
+    console.log(collectedEntriesContainer.children);
+    Array.from(collectedEntriesContainer.children)
+        .forEach((child) => {
+            sectionsArray.push(child.textContent)
+        });
+    document.getElementById('download-form-button').value = sectionsArray;
 })
 
 // No template
@@ -137,12 +130,12 @@ initialSearchBtn.addEventListener("click", () => {
     } else {
         initialSearchTerm = initialSearchTerm.value;
         documentDisplay.style.display = 'block';
-        rawSearchDoc(sessionDocHTML, initialSearchTerm);
+        rawSearchDoc(document.getElementById('docx-as-html-view').innerHTML, initialSearchTerm);
     }
 });
 
 newSearchBtn.addEventListener("click", () => {
-    rawSearchDoc(sessionDocHTML, newSearchTerm.value);
+    rawSearchDoc(document.getElementById('docx-as-html-view').innerHTML, newSearchTerm.value);
 })
 
 // Functions
@@ -233,7 +226,7 @@ function createDragandDropUI(seperatedSelectedCategories){
         collectedEntriesContainer.innerHTML += `
         <div class="selected-entry entry-header" draggable="true" data-index=${index}>
             ${entry[0]}
-            </strong><p class="show-entry-content">Show Content</p><p class="remove-selected-entry">x</p>
+            </strong><p class="show-entry-content hover-bold">Show Content</p><p class="remove-selected-entry hover-bold">x</p>
             <div class="hidden-entry-content">
                 ${entry[1]}            
             </div>
@@ -333,7 +326,7 @@ function rawSearchDoc(doc, searchTerm) {
     let regMatch = 0,
     exactMatch = 0;
 
-    if(doc.search(searchTerm.toLowerCase()) === -1 && doc.search(searchTerm.toUpperCase()) === -1){
+    if(doc.search(searchTerm.toLowerCase()) === -1 && doc.search(searchTerm.toUpperCase()) === -1 && doc.search(searchTerm) === -1){
         window.alert('term not found in document');
     } else {
 

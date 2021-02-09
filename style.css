@@ -114,6 +114,9 @@ input[type="text"] {
     padding: 30px;
     font-size: 2rem; } }
 
+.hover-bold:hover {
+  font-weight: bold; }
+
 .fullscreen-container {
   display: flex;
   flex-direction: column;
@@ -241,6 +244,9 @@ input[type="text"] {
   #start-1 {
     z-index: -1; } }
 
+#invalid-file-notice {
+  margin-top: 10px; }
+
 #settings-2 {
   position: absolute;
   top: 50%;
@@ -248,7 +254,7 @@ input[type="text"] {
   margin-left: -250px;
   margin-top: -100px;
   transform: translateX(100vw);
-  transition: transform 1.75s ease; }
+  transition: transform 0.5s ease; }
 
 #settings-2 .inner-content div {
   width: 98.75%;
@@ -326,14 +332,13 @@ input[type="text"] {
   width: 95%;
   margin-top: 20px;
   padding: 10px 5px;
-  border: 1px dotted black;
   border-radius: 5px; }
 
 #retreived-entries .collected-entries-container .entry-header .show-entry-content {
   font-size: 0.85rem;
   position: absolute;
-  right: 50%;
-  top: 10px;
+  right: 120px;
+  top: 5px;
   cursor: pointer; }
 
 #retreived-entries .collected-entries-container .entry-header .remove-selected-entry {
@@ -369,6 +374,9 @@ input[type="text"] {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
   width: 200px; }
+
+.save-as-new-file-container #save-as-new-file-input {
+  height: 42px; }
 
 #raw-search-3b {
   position: absolute;

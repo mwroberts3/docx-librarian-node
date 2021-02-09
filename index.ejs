@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css" />
     <title>.docx Librarian</title>
   </head>
@@ -13,7 +12,7 @@
           <p>
             Thank you for your interest in .docx Librarian. 
           </p>
-          <p>This web application is designed for screen sizes that are at least 1024px wide. A patch for mobile responsiveness is in the works.</p>
+          <p>This web application is designed for screen sizes that are at least 1024px wide. A patch for small-screen responsiveness is in the works.</p>
         </div>
     
     <section id="start-1">
@@ -21,7 +20,7 @@
         <div class="centered-container" draggable="true">
           <div class="inner-content">
             <h1>
-              .docx Librarian
+              .docx Librarian <small>v1.0.0</small>
             </h1>
             <div>
               <div style="padding-top: 10px"></div>
@@ -30,8 +29,11 @@
                   Choose File
                   <input name="docxUpload" id="file-upload" type="file" />
                 </label>
-                <input type="hidden" name="viewSection2" value="true" />
+                <input type="hidden" name="viewSettings2" value="true" />
               </form>
+              <% if (!validFile) { %>
+                <section id="invalid-file-notice"><em>Please select .docx file</em></section>
+              <% } %>
             </div>
             <nav>
               <p>
@@ -48,7 +50,7 @@
 
     <section id="settings-2">
       <div class="centered-container">
-        <div class="file-name"></div>
+        <div class="file-name"><%= fileName %></div>
         <div class="inner-content">
           <h2>Template Select</h2>
           <div>
@@ -68,7 +70,7 @@
       <div class="centered-container">
         <div class="inner-content">
           <div>
-            <div class="file-name displayed"></div>
+            <div class="file-name displayed"><%= fileName %></div>
             <div><a href="/"><span class="menu-text">Restart</span></a></div>
           </div>
          <h2>Select Categories to Include:</h2>
@@ -83,12 +85,17 @@
         <div>
           <button id="select-different-categories-btn">Select Different Categories</button>
           <div class="save-as-new-file-container">
-            <input id="save-as-new-file-input" type="text" placeholder="Enter File Name">
-            <button id="save-as-new-docx-file">Save As .docx File <small><em><strong>beta</strong></em></small></button>
+            <form action="/download" method="POST">
+              <input 
+              id="save-as-new-file-input" 
+              name="newFilenameInput" type="text" placeholder="Enter File Name">
+              <input id="download-form-button" type="hidden" name="dlAsDocx" value="">
+              <button id="save-as-new-docx-file">Save As .docx File</button>
+            </form>
           </div>
         </div>
         <div>
-          <div class="file-name displayed"></div>
+          <div class="file-name displayed"><%= fileName %></div>
           <div><a href="/"><span class="menu-text">Restart</span></a></div>
         </div>
       </div>
@@ -97,10 +104,9 @@
       </div>
     </section>
 
-
     <section id="raw-search-3b">
       <div class="centered-container">
-        <div class="file-name"></div>
+        <div class="file-name"><%= fileName %></div>
         <div class="inner-content">
           <h2>Enter search term</h2>
           <input id="initial-search-term" type="text" />
@@ -127,7 +133,7 @@
             <div class="search-stats"></div>
           </div>
           <div>
-            <div class="file-name displayed"></div>
+            <div class="file-name displayed"><%= fileName %></div>
             <div><a href="/"><span class="menu-text">Restart</span></a></div>
           </div>
       </div>
@@ -185,7 +191,7 @@
             </p>
             <p>
               <em>
-                <a href="Fall of Rome - Document Librarian Demo (4).docx" download>
+                <a href="Fall of Rome - Document Librarian Demo.docx" download>
                 Fall of Rome - demo document
                 </a>
               </em>
@@ -207,7 +213,7 @@
     <section id="docx-as-html-view" style="display: none">
       <%- docxAsHtml %>
     </section>
-    <% if (viewSection2) { %>
+    <% if (viewSettings2) { %>
     <script>
       document.getElementById('settings-2').classList.add('show')
     </script>
