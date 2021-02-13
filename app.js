@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const express = require('express');
 const app = express();
-const port = 5000;
+const port = 80;
 
 const multer = require('multer');
 const bodyParser = require('body-parser');
