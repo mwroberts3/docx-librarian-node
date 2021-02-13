@@ -33,8 +33,6 @@ let dragStartIndex;
 let dragged;
 
 let sessionDocHTML = '';
-let sessionRawText = '';
-let reader;
 
 let seperatedCategories = [];
 let seperatedSelectedCategories = [];
@@ -111,13 +109,7 @@ nextBtn.addEventListener("click", () => {
 }) 
 
 saveAsNewDocxFileBtn.addEventListener("click", () => {
-    let sectionsArray = [];
-    console.log(collectedEntriesContainer.children);
-    Array.from(collectedEntriesContainer.children)
-        .forEach((child) => {
-            sectionsArray.push(child.textContent)
-        });
-    document.getElementById('download-form-button').value = sectionsArray;
+    document.getElementById('download-form-button').value = collectedEntriesContainer.innerHTML;
 })
 
 // No template
@@ -150,9 +142,9 @@ function createCategoryList() {
     let list = [...list1, ...list2];
 
     // Remove any empty entries
-    list = list.filter(row => row.length > 10)
+    list = list.map(row => row.trim())
     list = list.filter(row => row[0] !== "<");
-
+  
     for(let i = 0; i < list.length; i++) {
         for(let j = 0; j < 100; j++){
             if (list[i][j] !== '<'){
@@ -161,7 +153,6 @@ function createCategoryList() {
             break;
         }
     }}
-
 
     labelList.forEach(label => {
         label = label.slice(9); 
@@ -216,7 +207,6 @@ function createCategoryList() {
     uniqueLabelList.forEach((row) => {
         categoryList.innerHTML += `<div><input class="category-checkbox"type="checkbox">&nbsp;<span>${row.catName}</span> (${row.count})</div>`;
     })
-
 }
 
 function createDragandDropUI(seperatedSelectedCategories){
@@ -279,7 +269,7 @@ function dragEvents() {
                 dragged.dataset.index++;
             }  
 
-            reorganizeCategories(draggables);
+            reorganizeCategories(document.querySelectorAll('.selected-entry'));
         })
 
         // Drag enter
@@ -293,7 +283,8 @@ function dragEvents() {
     collectedEntriesContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-selected-entry')) {
             console.log(e.target.parentElement);
-            e.target.parentElement.outerHTML='';
+            e.target.parentElement.remove();
+            // e.target.parentElement.outerHTML='';
         }
     })
 }
@@ -313,6 +304,7 @@ function reorganizeCategories(draggables) {
     collectedEntriesContainer.innerHTML = '';
 
     draggables.forEach((entry) => {
+        console.log(entry);
         // only add entries that haven't been deleted
         collectedEntriesContainer.innerHTML += entry.outerHTML;
     })

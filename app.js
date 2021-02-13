@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const { loadDocx, saveAsDocxFile } = require('./docx-functions');
 
 const fileFilter = (req, file, cb) => {
-    if (file.originalname.includes('docx')) {
+    if (file.originalname.includes('.docx')) {
         cb(null, true)
     } else {
         cb(null, false)
@@ -48,8 +48,10 @@ app.post('/', (req, res, next) => {
                 });
             })
             .catch(err => {
-                throw new Error(err);
-            });
+                const error = new Error(err);
+                error.httpStatusCode = 500;
+                return next(error);
+              });
     } else {
         res.render('index', {
             validFile: false,
@@ -58,23 +60,30 @@ app.post('/', (req, res, next) => {
 });
 
 app.post('/download', (req, res, next) => {
-    // console.log(req.body.dlAsDocx);
     saveAsDocxFile(req.body.dlAsDocx)
         .then((buffer) => {
-            fs.writeFileSync(`${req.body.newFilenameInput}.docx`, buffer);
-
-            // there's got to be a better way to not save the file on the server, but this works...
-            setTimeout(() => {
-                fs.unlink(`${req.body.newFilenameInput}.docx`, (err) => {
-                    if (err) throw err;
-                })
-            }, 1000)
-
-            res.download(`${req.body.newFilenameInput}.docx`);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            if (req.body.newFilenameInput) {
+                res.setHeader('Content-Disposition', 'attachment; filename=' + req.body.newFilenameInput.trim() + '.docx');
+            } else {
+                res.setHeader('Content-Disposition', 'attachment; filename=' + 'download.docx');
+            }
+            res.send(buffer);
             })
         .catch(err => {
-            throw new Error(err);
-        })
-})
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+            });
+});
+
+// Error handling
+app.use((err, req, res, next) => {
+    if (res.headersSent){
+        return next(err);
+    }
+    res.status(500);
+    res.render('error', {error: err})
+});
 
 app.listen(port);
