@@ -28,6 +28,7 @@ exports.saveAsDocxFile = (sectionsToSaveArr) => {
           table: { row: { cantSplit: true } },
           footer: true,
           pageNumber: false,
+          font: "trebuchet ms",
         });   
     
     return fileBuffer;

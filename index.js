@@ -43,7 +43,7 @@ let uniqueLabelList = [];
 
 // Event listeners
 // Load .docx file
-docsLink.addEventListener('click', () => dlDocs.style.display = 'block');
+// docsLink.addEventListener('click', () => dlDocs.style.display = 'block');
 
 fileUpload.addEventListener("change", (e) => {
     document.getElementById('file-select-form').submit();
@@ -58,7 +58,16 @@ useTemplateBtn.addEventListener('click', () => {
 collectedEntriesContainer.addEventListener("click", (e) => {
     if(e.target.classList.contains("show-entry-content")){
         e.target.nextElementSibling.nextElementSibling.classList.toggle("show-content");
-        e.target.textContent === 'Show Content' ? e.target.textContent = 'Hide Content' : e.target.textContent = 'Show Content';
+
+        if (e.target.textContent === 'Show Content') {
+            e.target.textContent = 'Hide Content';
+            e.target.parentElement.style.height = 'auto';
+        } else {
+            e.target.textContent = 'Show Content';
+            setTimeout(() => {
+                e.target.parentElement.style.height = '85px';
+            }, 150);
+        }
     }
 })
 
@@ -127,19 +136,23 @@ initialSearchBtn.addEventListener("click", () => {
 });
 
 newSearchBtn.addEventListener("click", () => {
-    rawSearchDoc(document.getElementById('docx-as-html-view').innerHTML, newSearchTerm.value);
+    if (newSearchTerm.value) {
+        rawSearchDoc(document.getElementById('docx-as-html-view').innerHTML, newSearchTerm.value);
+    } else {
+        alert('Please enter search term');
+    };
 })
 
 // Functions
 function createCategoryList() {
     let docxHtml = document.getElementById('docx-as-html-view').innerHTML;
 
-    let list1 = docxHtml.split("<strong>LABEL:</strong> ");
-    let list2 = docxHtml.split("<strong>LABEL: </strong>");
+    let labelSplit = new RegExp(/<strong>\s*LABEL:\s*<\/strong>\s*/, 'g');
+
     let labelList = [];
     let tempSplit = [];
 
-    let list = [...list1, ...list2];
+    let list = docxHtml.split(labelSplit);
 
     // Remove any empty entries
     list = list.map(row => row.trim())
@@ -202,11 +215,17 @@ function createCategoryList() {
         }
     });
 
-    categoryList.innerHTML  += `<div><input class="category-checkbox-choose-all" type="checkbox">&nbsp;SELECT ALL`
+    let totalSections = 0;
 
     uniqueLabelList.forEach((row) => {
-        categoryList.innerHTML += `<div><input class="category-checkbox"type="checkbox">&nbsp;<span>${row.catName}</span> (${row.count})</div>`;
-    })
+        totalSections += row.count;
+    });
+
+    categoryList.innerHTML  += `<div><input class="category-checkbox-choose-all" type="checkbox">&nbsp;SELECT ALL&nbsp;(${totalSections})`;
+
+    uniqueLabelList.forEach((row) => {
+        categoryList.innerHTML += `<div><input class="category-checkbox"type="checkbox">&nbsp;<span>${row.catName}</span>&nbsp;(${row.count})</div>`;
+    });
 }
 
 function createDragandDropUI(seperatedSelectedCategories){
@@ -282,9 +301,7 @@ function dragEvents() {
     // Remove entry
     collectedEntriesContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-selected-entry')) {
-            console.log(e.target.parentElement);
             e.target.parentElement.remove();
-            // e.target.parentElement.outerHTML='';
         }
     })
 }
@@ -304,7 +321,6 @@ function reorganizeCategories(draggables) {
     collectedEntriesContainer.innerHTML = '';
 
     draggables.forEach((entry) => {
-        console.log(entry);
         // only add entries that haven't been deleted
         collectedEntriesContainer.innerHTML += entry.outerHTML;
     })
@@ -320,8 +336,9 @@ function rawSearchDoc(doc, searchTerm) {
 
     if(doc.search(searchTerm.toLowerCase()) === -1 && doc.search(searchTerm.toUpperCase()) === -1 && doc.search(searchTerm) === -1){
         window.alert('term not found in document');
+        documentContent.innerHTML = doc;
+        displaySearchStats(exactMatch, regMatch, searchTerm);
     } else {
-
         // counts the number of exact matches and regular matches
         for(let i = 0; i < doc.length; i++) {
             if (doc.substring(i, searchTerm.length + i) === searchTerm) {

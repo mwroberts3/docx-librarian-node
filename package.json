@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "start-server": "nodemon app.js",
-    "sass": "node-sass --watch ./ -o ./"
+    "sass": "node-sass --watch ./ -o ./ --recursive"
   },
   "author": "",
   "license": "ISC",

@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs');
 
 const express = require('express');
 const app = express();
@@ -22,7 +21,10 @@ app.set('views', './');
 app.set('view engine', 'ejs');
 
 app.use(multer({ fileFilter: fileFilter }).single('docxUpload'));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ 
+    limit: '50mb',
+    extended: false
+}));
 app.use(express.static(path.join(__dirname)));
 
 app.use((req, res, next) => {
@@ -30,8 +32,9 @@ app.use((req, res, next) => {
     res.locals.validFile = true;
     res.locals.docxAsHtml = '';
     res.locals.fileName = '';
+    res.locals.viewDocs = false;
     next();
-})
+});
 
 app.get('/', (req, res, next) => {
     res.render('index');
@@ -47,11 +50,7 @@ app.post('/', (req, res, next) => {
                     fileName: req.file.originalname
                 });
             })
-            .catch(err => {
-                const error = new Error(err);
-                error.httpStatusCode = 500;
-                return next(error);
-              });
+            .catch(err => next(err));
     } else {
         res.render('index', {
             validFile: false,
@@ -70,20 +69,18 @@ app.post('/download', (req, res, next) => {
             }
             res.send(buffer);
             })
-        .catch(err => {
-            const error = new Error(err);
-            error.httpStatusCode = 500;
-            return next(error);
-            });
+        .catch(err => next(err));
+});
+
+app.get('/docs', (req, res, next) => {
+    res.render('index', {
+        viewDocs: true
+    });
 });
 
 // Error handling
 app.use((err, req, res, next) => {
-    if (res.headersSent){
-        return next(err);
-    }
-    res.status(500);
-    res.render('error', {error: err})
+    res.status(500).render('error', {error: err})
 });
 
 app.listen(port);
